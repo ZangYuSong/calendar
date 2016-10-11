@@ -1,0 +1,414 @@
+body {
+    font-family: Verdana, Geneva, sans-serif;
+}
+
+
+/* 右键菜单 */
+
+.dayRightClick {
+    position: absolute;
+    width: 120px;
+    height: 168px;
+    background-color: #F5F5F5;
+    border: 1px solid #979797;
+    overflow: hidden;
+    display: block;
+    padding-bottom: 5px;
+    padding-top: 5px;
+    cursor: pointer;
+    z-index: 3;
+}
+
+
+/* 右键菜单-条目 */
+
+.dayRightClick .menu-item {
+    float: left;
+    height: 30px;
+    line-height: 30px;
+    overflow: hidden;
+    width: 110px;
+    margin: 5px;
+    border: 1px solid #F5F5F5;
+}
+
+.dayRightClick .menu-item:hover {
+    border: 1px solid #979797;
+    background-color: #f9f9f9;
+}
+
+
+/* 右键菜单，条目左边的图标 */
+
+.dayRightClick .menu-ico {
+    float: left;
+    height: 30px;
+    width: 30px;
+    overflow: hidden;
+}
+
+
+/* 右键菜单，条目左边的图标。我这里使用字体显示的 */
+
+.dayRightClick .menu-ico .icoText {
+    float: left;
+    margin: 5px;
+    line-height: 20px;
+    overflow: hidden;
+    font-family: "微软雅黑", "宋体", Arial, sans-serif;
+}
+
+
+/* 右键菜单，条目右边的字体 */
+
+.dayRightClick .menu-text {
+    float: left;
+    overflow: hidden;
+    font-family: "微软雅黑", "宋体", Arial, sans-serif;
+}
+
+
+/* 右键菜单 下划线 */
+
+.dayRightClick .menu-line {
+    float: left;
+    overflow: hidden;
+    height: 1px;
+    background-color: #949d97;
+    margin-left: 5px;
+    margin-right: 5px;
+    width: 110px;
+}
+
+.calendar {
+    border: 2px solid #8ec59b;
+}
+
+
+/* 日历左边区域 */
+
+.calendar .leftArea {
+    padding: 8px;
+    float: left;
+    overflow: hidden;
+    background-color: #fff;
+}
+
+
+/* 日历左边区域  头 */
+
+.calendar .leftArea .head {
+    display: block;
+    float: left;
+    overflow: hidden;
+    margin-bottom: 4px;
+    font-size: 16px;
+}
+
+
+/* 日历左边区域  头部的左右按钮 */
+
+.calendar .leftArea .head .btn {
+    float: left;
+    height: 24px;
+    width: 20px;
+    border: 1px solid #999;
+    background-color: #fafafa;
+    text-align: center;
+    line-height: 24px;
+    color: #7a7a7a;
+    cursor: pointer;
+}
+
+.calendar .leftArea .head .btn:hover {
+    color: #388bff;
+    border: 1px solid #388bff;
+}
+
+.calendar .leftArea .head .btn:active {
+    color: #7a7a7a;
+    border: 1px solid #999;
+}
+
+
+/* 日历左边区域  头部的返回今天按钮 */
+
+.calendar .leftArea .head .btnreturn {
+    float: left;
+    padding: 0 14px;
+    height: 26px;
+    line-height: 26px;
+    border: 1px solid #d8d8d8;
+    cursor: pointer;
+    text-align: center;
+    background-color: #f9f9f9;
+    font-size: 13px;
+    font-family: Verdana, Geneva, sans-serif;
+}
+
+.calendar .leftArea .head .btnreturn:hover {
+    border: 1px solid #388bff;
+}
+
+.calendar .leftArea .head .btnreturn:active {
+    border: 1px solid #a2a6ab;
+}
+
+
+/* 日历左边区域  头部的字体样式 */
+
+.calendar .leftArea .head .text {
+    float: left;
+    height: 24px;
+    line-height: 24px;
+    margin-left: 4px;
+    margin-right: 20px;
+}
+
+
+/* 日历左边区域  头部的选择框 */
+
+.calendar .leftArea .head select {
+    float: left;
+    height: 26px;
+    width: 75px;
+}
+
+
+/* 日历左边区域  头部的周 */
+
+.calendar .leftArea .week {
+    font-size: 16px;
+    text-align: center;
+    display: block;
+    float: left;
+    border-top-width: 1px;
+    border-top-style: solid;
+    border-top-color: #5caeff;
+    padding-top: 6px;
+    margin-bottom: 6px;
+    overflow: hidden;
+}
+
+
+/* 日历左边区域  日历的主体 */
+
+.calendar .leftArea .days {
+    float: left;
+    border: 1px solid #f1ebe4;
+    display: block;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+
+/* 日历左边区域  加班和休假挂件 */
+
+.calendar .leftArea .days .rest {
+    position: relative;
+    padding: 2px;
+    margin: 2px;
+    font-size: 12px;
+    z-index: 2;
+    color: #fff;
+}
+
+
+/* 日历左边区域  天 */
+
+.calendar .leftArea .days1 {
+    float: left;
+    border: 1px solid #f1ebe4;
+    display: block;
+    overflow: hidden;
+}
+
+
+/* 日历左边区域  天 上半部的数字 */
+
+.calendar .leftArea .num {
+    display: block;
+    overflow: hidden;
+    text-align: center;
+    font-size: 18px;
+    width: 100%;
+    height: 50%;
+}
+
+
+/* 日历左边区域  天 下半部的农历 */
+
+.calendar .leftArea .lunar {
+    display: block;
+    overflow: hidden;
+    text-align: center;
+    font-size: 14px;
+    text-align: center;
+    display: block;
+    color: #999;
+    width: 100%;
+    height: 50%;
+}
+
+
+/* 日历右边区域 */
+
+.calendar .rightArea {
+    padding: 10px 20px 10px 20px;
+    float: left;
+    overflow: hidden;
+    background-color: #e0f3e8;
+}
+
+
+/* 日历右边区域 第一条 */
+
+.calendar .rightArea .ui {
+    background-color: #42962e;
+    width: 100%;
+    margin-right: auto;
+    margin-left: auto;
+    text-align: center;
+    font-size: 14px;
+    color: #FFF;
+    padding: 10px 0px 10px 0;
+    -moz-border-radius: 4px 4px 0 0;
+    -webkit-border-radius: 4px 4px 0 0;
+    border-radius: 4px 4px 0 0;
+}
+
+
+/* 日历右边区域 第二条 */
+
+.calendar .rightArea .ud {
+    background-color: #fb0;
+    width: 100%;
+    margin-right: auto;
+    margin-left: auto;
+    text-align: center;
+    font-size: 68px;
+    font-weight: bold;
+    color: #FFF;
+    padding: 10px 0px 10px 0;
+    -moz-border-radius: 0 0 4px 4px;
+    -webkit-border-radius: 0 0 4px 4px;
+    border-radius: 0 0 4px 4px;
+}
+
+
+/* 日历右边区域 第三条 */
+
+.calendar .rightArea .uld {
+    text-align: center;
+    font-size: 14px;
+    color: #000;
+    padding: 10px 0px 10px 0;
+}
+
+
+/* 日历右边区域 第四条 */
+
+.calendar .rightArea .ultd {
+    text-align: center;
+    font-size: 14px;
+    color: #000;
+    padding: 0px 0px 10px 0;
+    border-bottom-width: 1px;
+    border-bottom-style: solid;
+    border-bottom-color: #abd6b8;
+}
+
+
+/* 日历右边区域 节日一栏 */
+
+.calendar .rightArea .djr {
+    border-bottom-width: 1px;
+    border-bottom-style: solid;
+    border-bottom-color: #abd6b8;
+    padding-top: 8px;
+    padding-bottom: 8px;
+}
+
+
+/* 日历右边区域 节日一栏 头部 */
+
+.calendar .rightArea .djr .title {
+    font-size: 14px;
+    font-weight: bold;
+    background-color: #0faad1;
+    display: block;
+    float: left;
+    height: 24px;
+    line-height: 24px;
+    padding-right: 5px;
+    padding-left: 5px;
+    margin-right: 8px;
+    color: #FFF;
+}
+
+
+/* 日历右边区域 节日一栏 内容 */
+
+.calendar .rightArea .djr .content {
+    font-size: 12px;
+    line-height: 24px;
+    color: #000;
+}
+
+
+/* 日历右边区域 保存 */
+
+.calendar .rightArea .saveChange {
+    float: left;
+    background-color: #4cae4c;
+    color: #fff;
+    padding: 6px 15px;
+    border: 1px solid transparent;
+    font-size: 16px;
+    line-height: 1.42857143;
+    vertical-align: middle;
+    cursor: pointer;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    font-family: Verdana, Geneva, sans-serif;
+    margin-top: 20px;
+}
+
+.calendar .rightArea .saveChange:hover {
+    background-color: #449d44;
+}
+
+.calendar .rightArea .saveChange:active {
+    background-color: #4cae4c;
+}
+
+
+/* 日历右边区域 重置 */
+
+.calendar .rightArea .resetData {
+    float: left;
+    background-color: #ec971f;
+    color: #fff;
+    padding: 6px 15px;
+    border: 1px solid transparent;
+    font-size: 16px;
+    line-height: 1.42857143;
+    vertical-align: middle;
+    cursor: pointer;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    behavior: url(/PIE.htc);
+    z-index: 2;
+    font-family: Verdana, Geneva, sans-serif;
+    margin-top: 10px;
+}
+
+.calendar .rightArea .resetData:hover {
+    background-color: #d58512;
+}
+
+.calendar .rightArea .resetData:active {
+    background-color: #ec971f;
+}
