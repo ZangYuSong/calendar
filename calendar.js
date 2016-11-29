@@ -1,7 +1,7 @@
 (function () {
     var calendar = {
         /**
-        * 农历1900-2100的润大小信息表
+        * 农历1900-2100的闰大小信息表
         * 例如：0x04bd8 相当于 0000 0100 1011 1101 1000      19位 --->  0位
         * 第0-3位代表 是否是闰月，如果全为0代表不闰月，否则代表闰月的月份。
         * 第15-4位代表从1月到12月是大月还是小月，大月30天，小月29天。
@@ -177,35 +177,48 @@
             var demo = calendar.getLunarYearDays(Y);
             var result = 0;
             if (D > num) return [0, Y, M, (D - num)];
-            if (D == num) {
-                M -= 1;
-                if (M == 0) { M = 12; Y -= 1; }
-                demo = calendar.getLunarYearDays(Y);
-                return [0, Y, M, demo.lunarMonth[M - 1] == 0 ? 29 : 30];
-            }
-            if (num > D) {
-                num -= D;
-                M -= 1;
-                if (M == 0) { M = 12; Y -= 1; }
+            M -= 1;
+            if (M == 0) {
+                M = 12; Y -= 1;
                 demo = calendar.getLunarYearDays(Y);
             }
+            if (M == demo.leapMonth[0]) result = 1;
+            if (D == num) return [result, Y, M, demo.lunarMonth[M - 1] == 0 ? 29 : 30];
+            if (num > D) num -= D;
             while (true) {
                 var temp = 0;
-                if (demo.leapMonth[0] == M && result == 0) {
-                    result = 1;
+                if (demo.leapMonth[0] == M && result == 1) {
                     temp = demo.leapMonth[1];
-                    if (temp > num) { num = temp - num; break; }
                 } else {
                     temp = demo.lunarMonth[M - 1] == 0 ? 29 : 30;
-                    if (temp > num) { num = temp - num; break; }
-                    num -= temp;
-                    M -= 1;
-                    result == 0;
                 }
-                if (M == 0) {
-                    Y -= 1;
-                    M = 12;
-                    demo = calendar.getLunarYearDays(Y);
+                if (temp > num) { num = temp - num; break; }
+                num -= temp;
+                if (num == 0) {
+                    if (demo.leapMonth[0] == M && result == 1) {
+                        num = demo.lunarMonth[M - 1] == 0 ? 29 : 30;
+                        result = 0;
+                    } else {
+                        M -= 1;
+                        if (demo.leapMonth[0] == M) {
+                            result = 1;
+                            num = demo.leapMonth[1];
+                        }
+                        else {
+                            num = demo.lunarMonth[M - 1] == 0 ? 29 : 30;
+                        }
+                    }
+                    break;
+                }
+                if (demo.leapMonth[0] == M && result == 1) result = 0;
+                else {
+                    M -= 1;
+                    if (M == 0) {
+                        Y -= 1;
+                        M = 12;
+                        demo = calendar.getLunarYearDays(Y);
+                    }
+                    if (demo.leapMonth[0] == M) result = 1;
                 }
             }
             return [result, Y, M, num];
@@ -220,18 +233,23 @@
     var configDay = {};
     /* 本月信息 */
     var configDayM = {};
+    var isclick = false;
     /*************************主程序******************************/
     $.fn.calendar = function (options) {
         var e = this;
-        ToDay = options.date;
         var defaults = {
             date: new Date(),
             width: 800,
             height: 400,
             rate: 0.7,
+            week: false,
+            week_walue: "2016/9/17",
+            isclick: false,
             configDay: {}
         };
         var object = $.extend(true, {}, defaults, options);
+        ToDay = object.date;
+        isclick = object.isclick;
         configDay = object.configDay;
         createTable(object, e);
     };
@@ -250,7 +268,11 @@
         setLayer(options, datetable.count);
         /* 设置触发事件 */
         btnClick(options, e, datetable.count);
-        setconfigDay(options, datetable.count);
+        /* 设置单双休 */
+        if (options.week) {
+            setconfigDay(options, datetable.count, setWeek(options));
+        }
+        setconfigDay(options, datetable.count, configDayM);
         $("#SY").val(Y);
         $("#SM").val(M);
     }
@@ -261,23 +283,47 @@
         else configDayM = {};
     }
 
+    /* 设置单双休 */
+    function setWeek(options) {
+        var Y = options.date.getFullYear();
+        var M = options.date.getMonth() + 1;
+        var temp = new Date(Y + "/" + M + "/1").getDay();
+        var D = 7 - (temp == 0 ? 7 : temp)
+        if (D == 0) D = 7;
+        var _configDayM = "{"
+        var alldays = calendar.solarMonth[M - 1];
+        if ((M == 2) && (Y % 400 == 0 || (Y % 100 != 0 && Y % 4 == 0))) alldays += 1;
+        var week = 0;
+        while (alldays >= D) {
+            week = parseInt((new Date(Y + "/" + M + "/" + D) - new Date(options.week_walue)) / (3600 * 24 * 1000 * 7));
+            if (week != 0 && week % 2 != 0) _configDayM += "\"D" + D + "\":\"1\",";
+            D += 7;
+        }
+        _configDayM = _configDayM.substring(0, _configDayM.length - 1) + "}";
+        return JSON.parse(_configDayM);
+    }
+
     /* 设置加班休假日期 */
-    function setconfigDay(options, count) {
+    function setconfigDay(options, count, _configDayM) {
         var width = options.width;
         var height = options.height;
         var Y = options.date.getFullYear();
         var M = options.date.getMonth() + 1;
         var D = "0";
-        if (configDayM) {
-            $.each(configDayM, function (k, v) {
+        if (_configDayM) {
+            $.each(_configDayM, function (k, v) {
                 D = k.split("D")[1];
+                var temp = $("#days" + D).find(".xbgj");
+                if (temp.length > 0) {
+                    $("#days" + D).find(".xbgj").remove();
+                }
                 if (v == 0) {
                     $("#days" + D).append("<div class=\"xbgj\" xbgj=\"0\" style=\"position: absolute;\"><div class=\"rest\" style=\"top:" +
-            -parseInt((height - 16) / (count + 1) - 2) + "px;background-color: #e15e5e\">休</div></div>");
+            -parseInt((height - 16) / (count + 1) - 2) + "px;background-color: #53a253\">休</div></div>");
                 }
                 if (v == 1) {
-                    $("#days" + D).append("<div class=\"xbgj\" xbgj=\"0\" style=\"position: absolute;\"><div class=\"rest\" style=\"top:" +
-            -parseInt((height - 16) / (count + 1) - 2) + "px;background-color: #53a253\">班</div></div>");
+                    $("#days" + D).append("<div class=\"xbgj\" xbgj=\"1\" style=\"position: absolute;\"><div class=\"rest\" style=\"top:" +
+            -parseInt((height - 16) / (count + 1) - 2) + "px;background-color: #e15e5e\">班</div></div>");
                 }
             });
         }
@@ -384,7 +430,7 @@
             // 对应的农历日期
             if (lunar[3] === 1) {
                 temp = calendar.lunarMonthStr[lunar[2] - 1] + "月";
-                if (lunar[0] === 1) temp = "润" + temp;
+                if (lunar[0] === 1) temp = "闰" + temp;
             } else if (lunar[3] == 10) { temp = "初十"; }
             else { temp = calendar.lunarDayStrFirst[parseInt(lunar[3] / 10)] + calendar.lunarDayStrLast[lunar[3] % 10] }
             // 判断今天时候是对应节气的日期
@@ -400,7 +446,7 @@
                 $("#lunar" + (i + 1)).css("color", "green");
             }
             // 计算下个日期的农历
-            if (info.leapMonth[0] === lunar[2]) { flag = info.leapMonth[1]; }
+            if (info.leapMonth[0] === lunar[2] && lunar[0] == 1) { flag = info.leapMonth[1]; }
             else flag = info.lunarMonth[lunar[2] - 1] === 0 ? 29 : 30;
             if (lunar[3] + 1 > flag) {
                 lunar[3] = 1;
@@ -439,7 +485,7 @@
         var lunar = calendar.calendarConvert(Y, M, ClickDays);
         var temp = "";
         temp += calendar.lunarMonthStr[lunar[2] - 1] + " 月 ";
-        if (lunar[0] == 1) temp = "润 " + temp;
+        if (lunar[0] == 1) temp = "闰 " + temp;
         if (lunar[3] == 10) {
             temp += "初 十";
         } else {
@@ -448,8 +494,10 @@
         html += "<div class=\"uld\">" + temp + "</div>";
         html += getLunrYMD(lunar, Y, M);
         html += getJR(lunar, Y, M);
-        html += "<input type=\"button\" style=\"width:200px;\" value=\"保  存\" class=\"saveChange\" />";
-        html += "<input type=\"button\" style=\"width:200px;\" value=\"重  置\" class=\"resetData\" />";
+        if (isclick) {
+            html += "<input type=\"button\" style=\"width:100%;\" value=\"保  存\" class=\"saveChange\" />";
+            html += "<input type=\"button\" style=\"width:100%;\" value=\"重  置\" class=\"resetData\" />";
+        }
         $(".rightArea").empty();
         $(".rightArea").append(html);
         if (lunar[2] == 1 && lunar[3] == 1) {
@@ -459,7 +507,7 @@
             $(".calendar").css("border", "2px solid #8ec59b");
             $(".rightArea").css("background-color", "#e0f3e8");
         }
-        getPushClick(Y, M);
+        if (isclick) getPushClick(Y, M);
     };
 
     // 保存和重置按钮
@@ -470,16 +518,15 @@
         });
         $(".saveChange").click(function () {
             var html = "";
-            if (configDay["Y" + Y]) {
-                configDay["Y" + Y]["M" + M] = $.extend(true, {}, configDayM);
+            if (saveConfig(Y, M, configDayM)) {
+                if (configDay["Y" + Y]) {
+                    configDay["Y" + Y]["M" + M] = $.extend(true, {}, configDayM);
+                }
+                else {
+                    configDay["Y" + Y] = {};
+                    configDay["Y" + Y]["M" + M] = $.extend(true, {}, configDayM);
+                }
             }
-            else {
-                configDay["Y" + Y] = {};
-                configDay["Y" + Y]["M" + M] = $.extend(true, {}, configDayM);
-            }
-            /*
-            * 在这里添加代码，用于保存本月的设置 configDayM
-            */
         });
     }
 
@@ -552,7 +599,7 @@
                 delete configDayM["D" + D];
             }
             $(e).append("<div class=\"xbgj\" xbgj=\"0\" style=\"position: absolute;\"><div class=\"rest\" style=\"top:" +
-            -parseInt((height - 16) / (count + 1) - 2) + "px;background-color: #e15e5e\">休</div></div>");
+            -parseInt((height - 16) / (count + 1) - 2) + "px;background-color: #53a253\">休</div></div>");
             configDayM["D" + D] = 0;
             $(".dayRightClick").remove();
         });
@@ -568,7 +615,7 @@
                 delete configDayM["D" + D];
             }
             $(e).append("<div class=\"xbgj\" xbgj=\"1\" style=\"position: absolute;\"><div class=\"rest\" style=\"top:" +
-            -parseInt((height - 16) / (count + 1) - 2) + "px;background-color: #53a253\">班</div></div>");
+            -parseInt((height - 16) / (count + 1) - 2) + "px;background-color: #e15e5e\">班</div></div>");
             configDayM["D" + D] = 1;
             $(".dayRightClick").remove();
         });
@@ -602,21 +649,23 @@
             rightArea(Y, M);
         });
         // 右击日期事件
-        $(".days").contextmenu(function (e) {
-            var mouseX = e.originalEvent.x || e.originalEvent.layerX || 0;
-            var mouseY = e.originalEvent.y || e.originalEvent.layerY || 0;
-            $(".dayRightClick").remove();
-            var html = "<div class=\"dayRightClick\" style=\"top:" + mouseY + "px;left:" + mouseX + "px;\">";
-            html += "<div class=\"menu-item\" id=\"menu-overtime\"><div class=\"menu-ico\"><div class=\"icoText\" style=\"background-color: #e15e5e\">休</div></div><div class=\"menu-text\">休假</div></div>";
-            html += "<div class=\"menu-item\" id=\"menu-vacation\"><div class=\"menu-ico\"><div class=\"icoText\" style=\"background-color: #53a253\">班</div></div><div class=\"menu-text\">加班</div></div>";
-            html += "<div class=\"menu-item\" id=\"menu-cancel\"><div class=\"menu-ico\"></div><div class=\"menu-text\">取消</div></div>";
-            html += "<div class=\"menu-line\"></div>";
-            html += "<div class=\"menu-item\" id=\"menu-return\"><div class=\"menu-ico\"></div><div class=\"menu-text\">返回</div></div>";
-            html += "</div>";
-            $("body").append(html);
-            contextmenuClick(options, count, this);
-            return false;
-        });
+        if (isclick) {
+            $(".days").contextmenu(function (e) {
+                var mouseX = e.originalEvent.x || e.originalEvent.layerX || 0;
+                var mouseY = e.originalEvent.y || e.originalEvent.layerY || 0;
+                $(".dayRightClick").remove();
+                var html = "<div class=\"dayRightClick\" style=\"top:" + mouseY + "px;left:" + mouseX + "px;\">";
+                html += "<div class=\"menu-item\" id=\"menu-overtime\"><div class=\"menu-ico\"><div class=\"icoText\" style=\"background-color: #53a253\">休</div></div><div class=\"menu-text\">休假</div></div>";
+                html += "<div class=\"menu-item\" id=\"menu-vacation\"><div class=\"menu-ico\"><div class=\"icoText\" style=\"background-color: #e15e5e\">班</div></div><div class=\"menu-text\">加班</div></div>";
+                html += "<div class=\"menu-item\" id=\"menu-cancel\"><div class=\"menu-ico\"></div><div class=\"menu-text\">取消</div></div>";
+                html += "<div class=\"menu-line\"></div>";
+                html += "<div class=\"menu-item\" id=\"menu-return\"><div class=\"menu-ico\"></div><div class=\"menu-text\">返回</div></div>";
+                html += "</div>";
+                $("body").append(html);
+                contextmenuClick(options, count, this);
+                return false;
+            });
+        }
         $("body").contextmenu(function () {
             $(".dayRightClick").remove();
         });

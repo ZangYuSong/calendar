@@ -1,4 +1,5 @@
-﻿$(function() {
+﻿
+$(function() {
     $("#calendar").calendar({
         /*
          * 传入今天的时间
@@ -15,16 +16,9 @@
          * JSON格式：Y加年-M加月-D加日
          * 0表示休假 1表示加吧
          */
-        configDay: {
-            "Y2016": {
-                "M10": {
-                    "D1": 0,
-                    "D2": 0,
-                    "D3": 0,
-                    "D4": 1,
-                    "D5": 1
-                }
-            }
-        }
+        week: true, // 是否开启单双休
+        week_walue: "2016/9/17", // 双休对应的周六
+        isclick: true,
+        configDay: {} // 系统配置
     });
 });
