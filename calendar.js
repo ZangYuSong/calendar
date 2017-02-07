@@ -200,6 +200,10 @@
                         result = 0;
                     } else {
                         M -= 1;
+                        if (M == 0) {
+                            M = 12; Y -= 1;
+                            demo = calendar.getLunarYearDays(Y);
+                        }
                         if (demo.leapMonth[0] == M) {
                             result = 1;
                             num = demo.leapMonth[1];
